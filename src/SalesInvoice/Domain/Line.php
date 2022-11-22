@@ -8,50 +8,15 @@ use InvalidArgumentException;
 
 final class Line
 {
-    /**
-     * @var int
-     */
-    private $productId;
-
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var float
-     */
-    private $quantity;
-
-    /**
-     * @var int
-     */
-    private $quantityPrecision;
-
-    /**
-     * @var float
-     */
-    private $tariff;
-
-    /**
-     * @var string
-     */
-    private $currency;
-
-    /**
-     * @var float|null
-     */
-    private $discount;
-
-    /**
-     * @var string
-     */
-    private $vatCode;
-
-    /**
-     * @var float|null
-     */
-    private $exchangeRate;
+    private int $productId;
+    private string $description;
+    private float $quantity;
+    private int $quantityPrecision;
+    private float $tariff;
+    private string $currency;
+    private ?float $discount;
+    private string $vatCode;
+    private ?float $exchangeRate;
 
     public function __construct(
         int $productId,
