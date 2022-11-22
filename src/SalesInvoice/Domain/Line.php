@@ -15,7 +15,7 @@ final class Line
     private float $tariff;
     private string $currency;
     private ?float $discount;
-    private string $vatCode;
+    private VatCode $vatCode;
     private ?float $exchangeRate;
 
     public function __construct(
@@ -25,8 +25,8 @@ final class Line
         int $quantityPrecision,
         float $tariff,
         string $currency,
-        ?float $discount,
-        string $vatCode,
+        ?Discount $discount,
+        VatCode $vatCode,
         ?float $exchangeRate
     ) {
         $this->productId = $productId;
@@ -51,7 +51,7 @@ final class Line
             return 0.0;
         }
 
-        return round($this->amount() * $this->discount / 100, 2);
+        return $this->discount->apply($this->amount());
     }
 
     public function netAmount(): float
@@ -61,18 +61,7 @@ final class Line
 
     public function vatAmount(): float
     {
-        if ($this->vatCode === 'S') {
-            $vatRate = 21.0;
-        } elseif ($this->vatCode === 'L') {
-            if (new DateTime('now') < DateTime::createFromFormat('Y-m-d', '2019-01-01')) {
-                $vatRate = 6.0;
-            } else {
-                $vatRate = 9.0;
-            }
-        } else {
-            throw new InvalidArgumentException('Should not happen');
-        }
-
+        $vatRate = $this->vatCode->rate();
         return round($this->netAmount() * $vatRate / 100, 2);
     }
 
@@ -96,7 +85,7 @@ final class Line
         return $this->quantityPrecision;
     }
 
-    public function vatCode(): string
+    public function vatCode(): VatCode
     {
         return $this->vatCode;
     }

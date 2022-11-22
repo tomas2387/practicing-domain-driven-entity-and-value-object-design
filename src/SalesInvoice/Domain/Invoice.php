@@ -3,50 +3,17 @@ declare(strict_types=1);
 
 namespace SalesInvoice\Domain;
 
-use Assert\Assertion;
 use DateTimeImmutable;
 
 final class Invoice
 {
-    /**
-     * @var int
-     */
-    private $customerId;
-
-    /**
-     * @var string
-     */
-    private $currency;
-
-    /**
-     * @var float|null
-     */
-    private $exchangeRate;
-
-    /**
-     * @var int
-     */
-    private $quantityPrecision;
-
-    /**
-     * @var Line[]
-     */
-    private $lines = [];
-
-    /**
-     * @var bool
-     */
-    private $isFinalized = false;
-
-    /**
-     * @var bool
-     */
-    private $isCancelled = false;
-
-    /**
-     * @var DateTimeImmutable
-     */
-    private $invoiceDate;
+    private int $customerId;
+    private string $currency;
+    private ?float $exchangeRate;
+    private int $quantityPrecision;
+    private array $lines = [];
+    private Status $status;
+    private DateTimeImmutable $invoiceDate;
 
     /**
      * @param int $customerId
@@ -54,8 +21,7 @@ final class Invoice
      * @param float $exchangeRate
      * @param int $quantityPrecision
      * @param array<array-key, Line> $lines
-     * @param bool $isFinalized
-     * @param bool $isCancelled
+     * @param Status $status
      * @param DateTimeImmutable $invoiceDate
      */
     public function __construct(
@@ -64,8 +30,7 @@ final class Invoice
         float             $exchangeRate,
         int               $quantityPrecision,
         array             $lines,
-        bool              $isFinalized,
-        bool              $isCancelled,
+        Status            $status,
         DateTimeImmutable $invoiceDate
     )
     {
@@ -74,9 +39,8 @@ final class Invoice
         $this->exchangeRate = $exchangeRate;
         $this->quantityPrecision = $quantityPrecision;
         $this->lines = $lines;
-        $this->isFinalized = $isFinalized;
-        $this->isCancelled = $isCancelled;
         $this->invoiceDate = $invoiceDate;
+        $this->status = $status;
     }
 
     public function setCustomerId(int $customerId): void
@@ -105,14 +69,13 @@ final class Invoice
     }
 
     public function addLine(
-        int $productId,
-        string $description,
-        float $quantity,
-        float $tariff,
-        ?float $discount,
-        string $vatCode
+        int     $productId,
+        string  $description,
+        float   $quantity,
+        float   $tariff,
+        ?float  $discount,
+        VatCode $vatCode
     ): void {
-        Assertion::inArray($vatCode, ['S', 'L']);
 
         $this->lines[] = new Line(
             $productId,
@@ -125,6 +88,13 @@ final class Invoice
             $vatCode,
             $this->exchangeRate
         );
+    }
+
+    public function changeVatCode(VatCode $vatCode)
+    {
+        foreach ($this->lines as $line) {
+            $line->changeVatCode($vatCode);
+        }
     }
 
     public function totalNetAmount(): float
@@ -167,24 +137,24 @@ final class Invoice
         return round($this->totalVatAmount() / $this->exchangeRate, 2);
     }
 
-    public function setFinalized(bool $finalized): void
+    public function setFinalized(): void
     {
-        $this->isFinalized = $finalized;
+        $this->status->finalize();
     }
 
     public function isFinalized(): bool
     {
-        return $this->isFinalized;
+        return $this->status->isFinalized();
     }
 
-    public function setCancelled(bool $cancelled): void
+    public function setCancelled(): void
     {
-        $this->isCancelled = $cancelled;
+        $this->status->cancel();
     }
 
     public function isCancelled(): bool
     {
-        return $this->isCancelled;
+        return $this->status->isCancelled();
     }
 
     /**
