@@ -75,4 +75,29 @@ final class Line
 
         return round($this->netAmount() * $vatRate / 100, 2);
     }
+
+    public function productId(): int
+    {
+        return $this->productId;
+    }
+
+    public function description(): string
+    {
+        return $this->description;
+    }
+
+    public function quantity(): float
+    {
+        return $this->quantity;
+    }
+
+    public function quantityPrecision(): int
+    {
+        return $this->quantityPrecision;
+    }
+
+    public function vatCode(): string
+    {
+        return $this->vatCode;
+    }
 }

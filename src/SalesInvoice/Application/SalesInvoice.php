@@ -5,6 +5,7 @@ namespace SalesInvoice\Application;
 
 use Assert\Assertion;
 use DateTimeImmutable;
+use SalesInvoice\Domain\Invoice;
 use SalesInvoice\Domain\Line;
 use SalesInvoice\Infrastructure\Database;
 
@@ -21,7 +22,7 @@ final class SalesInvoice
      * @param int $customerId
      * @param string $currency
      * @param float $exchangeRate
-     * @param float $quantityPrecision
+     * @param int $quantityPrecision
      * @param array<array-key, Line> $lines
      * @param bool $isFinalized
      * @param bool $isCancelled
@@ -32,13 +33,13 @@ final class SalesInvoice
         int $customerId,
         string $currency,
         float $exchangeRate,
-        float $quantityPrecision,
+        int $quantityPrecision,
         array $lines,
         bool $isFinalized,
         bool $isCancelled,
         DateTimeImmutable $invoiceDate
     ): void {
-        $this->database->save('INSERT INTO invoice (customer_id, currency, exchange_rate, quantity_precision, lines, is_finalized, is_cancelled, invoice_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
+        $invoice = new Invoice(
             $customerId,
             $currency,
             $exchangeRate,
@@ -46,82 +47,43 @@ final class SalesInvoice
             $lines,
             $isFinalized,
             $isCancelled,
-            $invoiceDate,
-        ]);
+            $invoiceDate
+        );
+
+        $this->database->save($invoice);
     }
 
     public function addLinesToInvoice(Line $line): void
     {
-        [$customerId,
-         $currency,
-         $exchangeRate,
-         $quantityPrecision,
-         $lines,
-         $isFinalized,
-         $isCancelled,
-         $invoiceDate] = $this->database->byId();
+        $invoice = $this->database->byId();
 
-        $lines[] = $line;
+        $invoice->addLine(
+            $line->productId(),
+            $line->description(),
+            $line->quantity(),
+            $line->quantityPrecision(),
+            $line->discountAmount(),
+            $line->vatCode()
+        );
 
-        $this->database->save('INSERT INTO invoice (customer_id, currency, exchange_rate, quantity_precision, lines, is_finalized, is_cancelled, invoice_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
-            $customerId,
-            $currency,
-            $exchangeRate,
-            $quantityPrecision,
-            $lines,
-            $isFinalized,
-            $isCancelled,
-            $invoiceDate,
-        ]);
+        $this->database->save($invoice);
     }
 
     public function finalizeInvoice(): void
     {
-        [$customerId,
-         $currency,
-         $exchangeRate,
-         $quantityPrecision,
-         $lines,
-         $isFinalized,
-         $isCancelled,
-         $invoiceDate] = $this->database->byId();
+        $invoice = $this->database->byId();
 
-        $isFinalized = true;
+        $invoice->setFinalized(true);
 
-        $this->database->save('INSERT INTO invoice (customer_id, currency, exchange_rate, quantity_precision, lines, is_finalized, is_cancelled, invoice_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
-            $customerId,
-            $currency,
-            $exchangeRate,
-            $quantityPrecision,
-            $lines,
-            $isFinalized,
-            $isCancelled,
-            $invoiceDate,
-        ]);
+        $this->database->save($invoice);
     }
 
     public function cancelInvoice(): void
     {
-        [$customerId,
-         $currency,
-         $exchangeRate,
-         $quantityPrecision,
-         $lines,
-         $isFinalized,
-         $isCancelled,
-         $invoiceDate] = $this->database->byId();
+        $invoice = $this->database->byId();
 
-        $isCancelled = true;
+        $invoice->setCancelled(true);
 
-        $this->database->save('INSERT INTO invoice (customer_id, currency, exchange_rate, quantity_precision, lines, is_finalized, is_cancelled, invoice_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
-            $customerId,
-            $currency,
-            $exchangeRate,
-            $quantityPrecision,
-            $lines,
-            $isFinalized,
-            $isCancelled,
-            $invoiceDate,
-        ]);
+        $this->database->save($invoice);
     }
 }

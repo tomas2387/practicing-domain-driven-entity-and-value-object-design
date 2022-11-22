@@ -48,8 +48,35 @@ final class Invoice
      */
     private $invoiceDate;
 
-    public function __construct()
+    /**
+     * @param int $customerId
+     * @param string $currency
+     * @param float $exchangeRate
+     * @param int $quantityPrecision
+     * @param array<array-key, Line> $lines
+     * @param bool $isFinalized
+     * @param bool $isCancelled
+     * @param DateTimeImmutable $invoiceDate
+     */
+    public function __construct(
+        int               $customerId,
+        string            $currency,
+        float             $exchangeRate,
+        int               $quantityPrecision,
+        array             $lines,
+        bool              $isFinalized,
+        bool              $isCancelled,
+        DateTimeImmutable $invoiceDate
+    )
     {
+        $this->customerId = $customerId;
+        $this->currency = $currency;
+        $this->exchangeRate = $exchangeRate;
+        $this->quantityPrecision = $quantityPrecision;
+        $this->lines = $lines;
+        $this->isFinalized = $isFinalized;
+        $this->isCancelled = $isCancelled;
+        $this->invoiceDate = $invoiceDate;
     }
 
     public function setCustomerId(int $customerId): void
@@ -158,5 +185,22 @@ final class Invoice
     public function isCancelled(): bool
     {
         return $this->isCancelled;
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            $this->customerId,
+            $this->currency,
+            $this->exchangeRate,
+            $this->quantityPrecision,
+            $this->lines,
+            $this->isFinalized,
+            $this->isCancelled,
+            $this->invoiceDate,
+        ];
     }
 }

@@ -2,25 +2,18 @@
 
 namespace SalesInvoice\Infrastructure;
 
+use SalesInvoice\Domain\Invoice;
+
 class Database
 {
-    /** @var array<array-key, mixed> */
-    private array $params;
+    private Invoice $params;
 
-    /**
-     * @param string $sql
-     * @param array<array-key, mixed> $params
-     * @return void
-     */
-    public function save(string $sql, array $params): void
+    public function save(Invoice $invoice): void
     {
-        $this->params = $params;
+        $this->params = $invoice;
     }
 
-    /**
-     * @return array<array-key, mixed>
-     */
-    public function byId(): array
+    public function byId(): Invoice
     {
         return $this->params;
     }

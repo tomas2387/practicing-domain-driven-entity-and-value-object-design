@@ -15,7 +15,7 @@ final class InvoiceTest extends TestCase
      */
     public function it_calculates_the_correct_totals_for_an_invoice_in_foreign_currency(): void
     {
-        $salesInvoice = new Invoice();
+        $salesInvoice = $this->getInvoice();
         $salesInvoice->setCustomerId(1001);
         $salesInvoice->setInvoiceDate(new DateTimeImmutable());
         $salesInvoice->setCurrency('USD');
@@ -145,7 +145,7 @@ final class InvoiceTest extends TestCase
      */
     private function createInvoice(): Invoice
     {
-        $salesInvoice = new Invoice();
+        $salesInvoice = $this->getInvoice();
         $salesInvoice->setCustomerId(1001);
         $salesInvoice->setInvoiceDate(new DateTimeImmutable());
         $salesInvoice->setCurrency('EUR');
@@ -177,5 +177,19 @@ final class InvoiceTest extends TestCase
     private function anotherProductId(): int
     {
         return 2;
+    }
+
+    private function getInvoice(): Invoice
+    {
+        return new Invoice(
+            0,
+            '',
+            0.0,
+            0,
+            [],
+            false,
+            false,
+            new DateTimeImmutable()
+        );
     }
 }
