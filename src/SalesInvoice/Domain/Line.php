@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Domain\Model\SalesInvoice;
+namespace SalesInvoice\Domain;
 
 use DateTime;
 use InvalidArgumentException;

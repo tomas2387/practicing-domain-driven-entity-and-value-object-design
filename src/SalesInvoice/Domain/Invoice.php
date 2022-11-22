@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Domain\Model\SalesInvoice;
+namespace SalesInvoice\Domain;
 
 use Assert\Assertion;
 use DateTimeImmutable;
 
-final class SalesInvoice
+final class Invoice
 {
     /**
      * @var int

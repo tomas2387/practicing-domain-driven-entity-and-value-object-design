@@ -1,10 +1,12 @@
 <?php
 
-namespace Domain\Model\SalesInvoice;
+namespace SalesInvoice;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use SalesInvoice\Application\SalesInvoice;
+use SalesInvoice\Domain\Invoice;
 
 final class SalesInvoiceTest extends TestCase
 {
@@ -13,7 +15,7 @@ final class SalesInvoiceTest extends TestCase
      */
     public function it_calculates_the_correct_totals_for_an_invoice_in_foreign_currency(): void
     {
-        $salesInvoice = new SalesInvoice();
+        $salesInvoice = new Invoice();
         $salesInvoice->setCustomerId(1001);
         $salesInvoice->setInvoiceDate(new DateTimeImmutable());
         $salesInvoice->setCurrency('USD');
@@ -71,7 +73,7 @@ final class SalesInvoiceTest extends TestCase
      */
     public function it_calculates_the_correct_totals_for_an_invoice_in_ledger_currency(): void
     {
-        $salesInvoice = $this->createSalesInvoice();
+        $salesInvoice = $this->createInvoice();
         $salesInvoice->addLine(
             $this->aProductId(),
             'Product with a 10% discount and standard VAT applied',
@@ -98,7 +100,7 @@ final class SalesInvoiceTest extends TestCase
      */
     public function it_fails_when_you_provide_an_unknown_vat_code(): void
     {
-        $salesInvoice = $this->createSalesInvoice();
+        $salesInvoice = $this->createInvoice();
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -117,7 +119,7 @@ final class SalesInvoiceTest extends TestCase
      */
     public function you_can_finalize_an_invoice(): void
     {
-        $salesInvoice = $this->createSalesInvoice();
+        $salesInvoice = $this->createInvoice();
         self::assertFalse($salesInvoice->isFinalized());
 
         $salesInvoice->setFinalized(true);
@@ -130,7 +132,7 @@ final class SalesInvoiceTest extends TestCase
      */
     public function you_can_cancel_an_invoice(): void
     {
-        $salesInvoice = $this->createSalesInvoice();
+        $salesInvoice = $this->createInvoice();
         self::assertFalse($salesInvoice->isCancelled());
 
         $salesInvoice->setCancelled(true);
@@ -139,11 +141,11 @@ final class SalesInvoiceTest extends TestCase
     }
 
     /**
-     * @return SalesInvoice
+     * @return Invoice
      */
-    private function createSalesInvoice(): SalesInvoice
+    private function createInvoice(): Invoice
     {
-        $salesInvoice = new SalesInvoice();
+        $salesInvoice = new Invoice();
         $salesInvoice->setCustomerId(1001);
         $salesInvoice->setInvoiceDate(new DateTimeImmutable());
         $salesInvoice->setCurrency('EUR');
