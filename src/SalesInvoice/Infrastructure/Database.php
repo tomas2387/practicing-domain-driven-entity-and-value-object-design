@@ -4,7 +4,7 @@ namespace SalesInvoice\Infrastructure;
 
 class Database
 {
-    /** @var mixed[] */
+    /** @var array<array-key, mixed> */
     private array $params;
 
     /**
@@ -17,7 +17,10 @@ class Database
         $this->params = $params;
     }
 
-    public function byId()
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function byId(): array
     {
         return $this->params;
     }

@@ -50,7 +50,7 @@ final class SalesInvoice
         ]);
     }
 
-    public function addLinesToInvoice(Line $line)
+    public function addLinesToInvoice(Line $line): void
     {
         [$customerId,
          $currency,
@@ -75,7 +75,7 @@ final class SalesInvoice
         ]);
     }
 
-    public function finalizeInvoice()
+    public function finalizeInvoice(): void
     {
         [$customerId,
          $currency,
@@ -100,7 +100,7 @@ final class SalesInvoice
         ]);
     }
 
-    public function cancelInvoice()
+    public function cancelInvoice(): void
     {
         [$customerId,
          $currency,
